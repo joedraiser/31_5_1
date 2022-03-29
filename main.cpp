@@ -10,6 +10,11 @@ public:
     {
         this->name=oth.name;
     }
+
+    std::string getName()
+    {
+        return name;
+    }
 private:
     std::string name;
 };
@@ -23,6 +28,13 @@ public:
     shared_ptr_toy()
     {
         obj = nullptr;
+        owners = new unsigned int(1);
+    }
+
+    shared_ptr_toy(std::string name)
+    {
+        obj=new Toy(name);
+        owners = new unsigned int(1);
     }
 
     shared_ptr_toy(const shared_ptr_toy &oth)
@@ -36,6 +48,10 @@ public:
     {
         if ( this->obj == oth.obj)
             return *this;
+        else if(this==&oth)
+        {
+            return *this;
+        }
         else if ( obj == nullptr)
         {
             obj=oth.obj;
@@ -57,12 +73,14 @@ public:
         return *this;
     }
 
-    friend shared_ptr_toy make_shared_toy(std::string name);
-    friend shared_ptr_toy make_shared_toy(Toy& oth);
+    std::string operator*()
+    {
+        return obj->getName();
+    }
 
     ~shared_ptr_toy()
     {
-        *owners--;
+        (*owners)--;
         if(*owners<1)
         {
             delete obj;
@@ -73,17 +91,13 @@ public:
 
 shared_ptr_toy make_shared_toy(std::string name)
 {
-    shared_ptr_toy ptrToy;
-    ptrToy.obj=new Toy(name);
-    ptrToy.owners=new unsigned int(1);
+    shared_ptr_toy ptrToy(name);
     return ptrToy;
 }
 
 shared_ptr_toy make_shared_toy(Toy& oth)
 {
-    shared_ptr_toy ptrToy;
-    ptrToy.obj=new Toy(oth);
-    ptrToy.owners=new unsigned int(1);
+    shared_ptr_toy ptrToy(oth.getName());
     return ptrToy;
 }
 
@@ -99,6 +113,8 @@ int main()
     shared_ptr_toy toy6 = make_shared_toy(actToy1);
     shared_ptr_toy toy7 = toy3;
     toy4=toy1;
+
+    std::cout << *toy1;
 
     return 0;
 }
